@@ -2,23 +2,15 @@ package Infrastructure
 import play.api.db._
 import anorm._
 import anorm.SqlParser._
-import Models.User
+import Models.{Client, User}
 import javax.inject.{Inject, Singleton}
+
+import scala.concurrent.ExecutionException
 
 @Singleton
 class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRepositoryTrait {
 
-  val userMap: RowParser[User] = {
-    get[String]("id") ~
-    get[String]("firstName") ~
-    get[String]("lastName") ~
-    get[String]("email") ~
-    get[Boolean]("admin") ~
-    get[String]("address") ~
-    get[String]("phone") ~
-    get[String]("userPassword") map {case id ~ firstName ~ lastName ~ email ~ admin ~ address ~ phone ~ userPassword => User(id, firstName, lastName, email, admin, address, phone, userPassword)}
 
-  }
    override def addNewUser(user: User): Unit = {
      DB.withConnection{implicit connection =>
        SQL("INSERT INTO USERS (id,firstName,lastName,email,admin,address,phone,userPassword)" +
@@ -58,8 +50,60 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
 
   override def getUser(id: String): User = {
     DB.withConnection{implicit  connection =>
-      SQL("SELECT * FROM Users WHERE id = {id}").on("id" -> {id}).as(User.mapUserFromDB.single )
+      try {
+        SQL("SELECT * FROM Users WHERE id = {id}").on("id" -> {
+          id
+        }).as(User.mapUserFromDB.single)
+      } catch  {
+        case ex: AnormException => return null;
+      }
     }
+  }
 
+  override def addNewClient(client: Client): Unit = {
+    DB.withConnection { implicit connection =>
+
+      SQL("INSERT INTO CLIENTS (id,firstName,lastName,gender,comments,birthday)" +
+        "VALUES({id},{firstName},{lastName},{gender},{comments},{birthday})").on(
+        "id" -> client.id,
+        "firstName" -> client.firstName,
+        "lastName" -> client.lastName,
+        "gender" -> client.gender,
+        "comments" -> client.comments,
+        "birthday" -> client.birthday
+      ).execute()
+
+    }
+  }
+
+  override def deleteClient(id: String): Unit = {
+    DB.withConnection{implicit  connection =>
+      SQL("DELETE FROM CLIENTS WHERE id = {id}").on("id" -> id).execute()
+    }
+  }
+
+  override def getClient(id: String): Client = {
+    DB.withConnection{implicit  connection =>
+      try {
+        SQL("SELECT * FROM CLIENTS WHERE id = {id}").on("id" -> {
+          id
+        }).as(Client.mapClientFromDB.single)
+      } catch  {
+        case ex: AnormException => return null;
+      }
+    }
+  }
+
+  override def updateClient(client: Client): Unit = {
+    DB.withConnection{implicit  connection =>
+      SQL("UPDATE CLIENTS SET firstName = {firstName}, lastName = {lastName},gender = {gender},comments = {comments},birthday = {birthday} WHERE id = {id}").on(
+        "id" -> client.id,
+        "firstName" -> client.firstName,
+        "lastName" -> client.lastName,
+        "gender" -> client.gender,
+        "comments" -> client.comments,
+        "birthday" -> client.birthday
+      ).execute()
+    }
   }
 }

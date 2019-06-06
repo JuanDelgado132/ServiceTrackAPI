@@ -10,7 +10,11 @@ import play.api.libs.json._ // JSON library
 class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTrackDBRepository) extends AbstractController(cc){
 
   def getUser(id: String) = Action{
-    Ok(Json.toJson(repository.getUser(id)))
+    val user = repository.getUser(id)
+    if(user == null)
+      Ok(s"User ${id} does not exist")
+    else
+      Ok(Json.toJson(user))
   }
   def DeleteUser(id: String) = Action {
     repository.deleteUser(id)

@@ -20,7 +20,7 @@ CREATE TABLE CLIENTS (
     lastName VARCHAR (40),
     gender VARCHAR (15),
     comments VARCHAR(200),
-    birthday DATE, active int(1),
+    birthday varchar(100), active int(1),
     PRIMARY KEY (id)
 );
 CREATE TABLE SERVICES (
@@ -36,6 +36,8 @@ CREATE TABLE SERVICES (
 INSERT INTO USERS (id,firstName,lastName,email,admin,address,phone,userPassword)
 VALUES('9ee0293b-36c7-4ae3-ad7a-c83e8afcbde6','John','Doe','admin@gmail.com',1,'785 W Street Brownsville, Tx', '7853359856','qwaszx');
 
+INSERT INTO CLIENTS (id, firstName, lastName, gender, comments, birthday)
+VALUES('f968e4f5-1afd-44db-883d-1dcd3915d761', 'Juan', 'Delgado', 'Male', 'Test', '02-14-1998');
 -- !Downs
 
 DROP TABLE USERS;
