@@ -3,30 +3,44 @@ package controllers
 import Infrastructure.ServiceTrackDBRepository
 import Models.User
 import javax.inject._
-import play.api.libs.json.{JsPath, Writes}
 import play.api.mvc._
 import play.api.libs.json._ // JSON library
-import play.api.libs.json.Reads._ // Custom validation helpers
-import play.api.libs.functional.syntax._
-
 
 @Singleton
 class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTrackDBRepository) extends AbstractController(cc){
-  implicit val userWrites: Writes[User] = (
-    (JsPath \ "id").write[Int] and
-      (JsPath \ "firstName").write[String] and
-      (JsPath \ "lastName").write[String] and
-      (JsPath \ "email").write[String] and
-      (JsPath \ "admin").write[Boolean] and
-      (JsPath \ "address").write[String] and
-      (JsPath \ "phone").write[String] and
-      (JsPath \ "userPassword").write[String])(unlift(User.unapply))
 
-
-  def getUser(id: Int) = Action {
-
-
+  def getUser(id: String) = Action{
     Ok(Json.toJson(repository.getUser(id)))
+  }
+  def DeleteUser(id: String) = Action {
+    repository.deleteUser(id)
+    Ok("User successfully deleted")
+  }
+
+  def CreateNewUser = Action { implicit request =>
+    request.body.asJson.get.validate[User] match {
+      case s: JsSuccess[User] => {
+        val userToCreate = s.get
+        repository.addNewUser(userToCreate)
+        Created(Json.toJson(repository.getUser(userToCreate.id)))
+      }
+      case e: JsError => {
+        BadRequest("A validation error occured")
+      }
+    }
+  }
+  def UpdateUser = Action { implicit request =>
+    request.body.asJson.get.validate[User] match {
+      case s: JsSuccess[User] => {
+        val userToUpdate = s.get
+        println(userToUpdate)
+        repository.updateUser(userToUpdate)
+        Ok(Json.toJson(repository.getUser(userToUpdate.id)))
+      }
+      case e: JsError => {
+        BadRequest("A validation error occured")
+      }
+    }
   }
 
 }

@@ -2,7 +2,7 @@
 
 # --- !Ups
 CREATE TABLE USERS(
-    id int(7) NOT NULL,
+    id CHAR(36) NOT NULL,
     firstName VARCHAR(40),
     lastName VARCHAR (40),
     email VARCHAR(50),
@@ -15,7 +15,7 @@ CREATE TABLE USERS(
 );
 
 CREATE TABLE CLIENTS (
-    id int(7) NOT NULL,
+    id CHAR(36) NOT NULL,
     firstName VARCHAR(40),
     lastName VARCHAR (40),
     gender VARCHAR (15),
@@ -24,7 +24,7 @@ CREATE TABLE CLIENTS (
     PRIMARY KEY (id)
 );
 CREATE TABLE SERVICES (
-    serviceId int(7) NOT NULL,
+    serviceId CHAR(36) NOT NULL,
     serviceName VARCHAR(50),
     serviceDescription VARCHAR(50),
     days VARCHAR(50),
@@ -34,7 +34,7 @@ CREATE TABLE SERVICES (
 );
 
 INSERT INTO USERS (id,firstName,lastName,email,admin,address,phone,userPassword)
-VALUES(7795631,'John','Doe','admin@gmail.com',1,'785 W Street Brownsville, Tx', '7853359856','qwaszx');
+VALUES('9ee0293b-36c7-4ae3-ad7a-c83e8afcbde6','John','Doe','admin@gmail.com',1,'785 W Street Brownsville, Tx', '7853359856','qwaszx');
 
 -- !Downs
 

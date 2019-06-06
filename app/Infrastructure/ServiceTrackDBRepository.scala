@@ -9,7 +9,7 @@ import javax.inject.{Inject, Singleton}
 class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRepositoryTrait {
 
   val userMap: RowParser[User] = {
-    get[Int]("id") ~
+    get[String]("id") ~
     get[String]("firstName") ~
     get[String]("lastName") ~
     get[String]("email") ~
@@ -21,8 +21,8 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
   }
    override def addNewUser(user: User): Unit = {
      DB.withConnection{implicit connection =>
-       SQL("INSERT INTO USERS (id,first_name,last_name,email,admin,address,phone,user_password)" +
-         "VALUES({id},{first_name},{last_name},{email},{admin},{address},{phone},{user_password})").on(
+       SQL("INSERT INTO USERS (id,firstName,lastName,email,admin,address,phone,userPassword)" +
+         "VALUES({id},{firstName},{lastName},{email},{admin},{address},{phone},{userPassword})").on(
          "id" -> user.id,
          "firstName" -> user.firstName,
          "lastName" -> user.lastName,
@@ -37,35 +37,28 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
 
   override def updateUser(user: User): Unit = {
     DB.withConnection{implicit connection =>
-      SQL("UPDATE Users SET id = {id}," +
-        "first_name = {firstName}," +
-        "last_name = {lastName}," +
-        "email = {email}," +
-        "admin = {admin}," +
-        "address = {address}," +
-        "phone = {phone}," +
-        "user_password = {userPassword}").on(
+      SQL("UPDATE Users SET firstName = {firstName}, lastName = {lastName},email = {email},admin = {admin},address = {address},phone = {phone},userPassword = {userPassword} WHERE id = {id}").on(
         "id" -> user.id,
-        "first_name" -> user.firstName,
-        "last_name" -> user.lastName,
+        "firstName" -> user.firstName,
+        "lastName" -> user.lastName,
         "email" -> user.email,
         "admin" -> user.admin,
         "address" -> user.address,
         "phone" -> user.phone,
-        "user_password" -> user.userPassword
+        "userPassword" -> user.userPassword
       ).execute()
     }
   }
 
-  override def deleteUser(id: Int): Unit = {
+  override def deleteUser(id: String): Unit = {
     DB.withConnection{ implicit connection =>
       SQL("DELETE FROM Users WHERE id = {id}").on("id" -> id).execute()
     }
   }
 
-  override def getUser(id: Int): User = {
+  override def getUser(id: String): User = {
     DB.withConnection{implicit  connection =>
-      SQL("SELECT * FROM Users WHERE id = {id}").on("id" -> {id}).as(userMap.single )
+      SQL("SELECT * FROM Users WHERE id = {id}").on("id" -> {id}).as(User.mapUserFromDB.single )
     }
 
   }

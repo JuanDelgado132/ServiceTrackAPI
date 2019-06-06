@@ -6,8 +6,8 @@ import com.google.inject.ImplementedBy
 trait ServiceTrackDBRepositoryTrait {
 
   def addNewUser(user: User)
-  def getUser(id: Int): User
-  def deleteUser(id: Int)
+  def getUser(id: String): User
+  def deleteUser(id: String)
   def updateUser(user: User)
 
 }
