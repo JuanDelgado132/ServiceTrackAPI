@@ -12,7 +12,7 @@ class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTr
   def getUser(id: String) = Action{
     val user = repository.getUser(id)
     if(user == null)
-      Ok(s"User ${id} does not exist")
+      NotFound(s"User ${id} does not exist")
     else
       Ok(Json.toJson(user))
   }

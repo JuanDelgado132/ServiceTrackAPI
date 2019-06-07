@@ -1,5 +1,5 @@
 package Infrastructure
-import Models.{Client, User}
+import Models.{Client, Service, User}
 import com.google.inject.ImplementedBy
 
 @ImplementedBy(classOf[ServiceTrackDBRepository])
@@ -13,5 +13,9 @@ trait ServiceTrackDBRepositoryTrait {
   def getClient(id: String) : Client
   def updateClient(client: Client)
   def deleteClient(id: String)
+  def addNewService(service: Service)
+  def getService(id: String) : Service
+  def updateService(service: Service)
+  def deleteService(id: String)
 
 }

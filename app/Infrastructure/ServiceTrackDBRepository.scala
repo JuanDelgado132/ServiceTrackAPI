@@ -2,8 +2,9 @@ package Infrastructure
 import play.api.db._
 import anorm._
 import anorm.SqlParser._
-import Models.{Client, User}
+import Models.{Client, Service, User}
 import javax.inject.{Inject, Singleton}
+import org.h2.command.dml.Delete
 
 import scala.concurrent.ExecutionException
 
@@ -104,6 +105,52 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
         "comments" -> client.comments,
         "birthday" -> client.birthday
       ).execute()
+    }
+  }
+
+  override def addNewService(service: Service): Unit = {
+    DB.withConnection{ implicit  connection =>
+      SQL("INSERT INTO SERVICES (id,serviceName,serviceDescription,days,time,active)" +
+        "VALUES({id},{serviceName},{serviceDescription},{days},{time},{active})").on(
+        "id" -> service.id,
+        "serviceName" -> service.serviceName,
+        "serviceDescription" -> service.serviceDescription,
+        "days" -> service.days,
+        "time" -> service.time,
+        "active" -> service.active
+      ).execute()
+    }
+  }
+
+  override def getService(id: String): Service = {
+    DB.withConnection{implicit connection =>
+      try {
+        SQL("SELECT * FROM SERVICES WHERE id = {id}").on("id" -> {
+          id
+        }).as(Service.mapServiceFromDB.single)
+      } catch  {
+        case ex: AnormException => return null;
+      }
+    }
+  }
+
+  override def deleteService(id: String): Unit = {
+    DB.withConnection{implicit connection =>
+      SQL("DELETE FROM SERVICES WHERE id = {id}").on("id" -> {id}).execute()
+    }
+  }
+
+  override def updateService(service: Service): Unit = {
+    DB.withConnection{implicit  connection =>
+      SQL("UPDATE SERVICES SET serviceName = {serviceName}, serviceDescription = {serviceDescription}, days = {days}, time = {time}, active = {active} WHERE id = {id}").on(
+          "id" -> service.id,
+          "serviceName" -> service.serviceName,
+          "serviceDescription" -> service.serviceDescription,
+          "days" -> service.days,
+          "time" -> service.time,
+          "active" -> service.active
+        ).execute()
+
     }
   }
 }
