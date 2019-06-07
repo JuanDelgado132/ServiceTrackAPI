@@ -33,6 +33,14 @@ POST    /services                     controllers.ServiceController.createNewSer
 PUT     /services                     controllers.ServiceController.updateService()
 
 DELETE  /services/:id                  controllers.ServiceController.deleteService(id: String)
+
+POST    /clients/:clientId/services/:serviceId       controllers.ServiceController.RegisterService(clientId: String, serviceId: String)
+
+GET     /clients/:id/services                       controllers.ClientsController.getClientWithServices(id: String)
+
+GET     /registered/services                        controllers.ServiceController.getRegisteredServices()
+
+GET     /unregistered/services                      controllers.ServiceController.getUnregisteredServices()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

@@ -46,4 +46,9 @@ class ClientsController @Inject() (cc: ControllerComponents, repository: Service
     Ok("Client successfully deleted")
   }
 
+  def getClientWithServices(clientId: String) = Action{
+    val clientServiceRel = repository.getClientWithServices(clientId)
+    Ok(Json.toJson(clientServiceRel))
+  }
+
 }

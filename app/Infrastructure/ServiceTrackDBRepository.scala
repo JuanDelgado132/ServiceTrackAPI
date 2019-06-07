@@ -2,8 +2,9 @@ package Infrastructure
 import play.api.db._
 import anorm._
 import anorm.SqlParser._
-import Models.{Client, Service, User}
+import Models.{Client, ClientServiceRel, ListServices, Service, User}
 import javax.inject.{Inject, Singleton}
+import play.api.data._
 import org.h2.command.dml.Delete
 
 import scala.concurrent.ExecutionException
@@ -110,9 +111,9 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
 
   override def addNewService(service: Service): Unit = {
     DB.withConnection{ implicit  connection =>
-      SQL("INSERT INTO SERVICES (id,serviceName,serviceDescription,days,time,active)" +
-        "VALUES({id},{serviceName},{serviceDescription},{days},{time},{active})").on(
-        "id" -> service.id,
+      SQL("INSERT INTO SERVICES (serviceId,serviceName,serviceDescription,days,time,active)" +
+        "VALUES({serviceId},{serviceName},{serviceDescription},{days},{time},{active})").on(
+        "serviceId" -> service.serviceId,
         "serviceName" -> service.serviceName,
         "serviceDescription" -> service.serviceDescription,
         "days" -> service.days,
@@ -125,7 +126,7 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
   override def getService(id: String): Service = {
     DB.withConnection{implicit connection =>
       try {
-        SQL("SELECT * FROM SERVICES WHERE id = {id}").on("id" -> {
+        SQL("SELECT * FROM SERVICES WHERE serviceId = {serviceId}").on("serviceId" -> {
           id
         }).as(Service.mapServiceFromDB.single)
       } catch  {
@@ -136,14 +137,14 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
 
   override def deleteService(id: String): Unit = {
     DB.withConnection{implicit connection =>
-      SQL("DELETE FROM SERVICES WHERE id = {id}").on("id" -> {id}).execute()
+      SQL("DELETE FROM SERVICES WHERE serviceId = {serviceId}").on("serviceId" -> {id}).execute()
     }
   }
 
   override def updateService(service: Service): Unit = {
     DB.withConnection{implicit  connection =>
-      SQL("UPDATE SERVICES SET serviceName = {serviceName}, serviceDescription = {serviceDescription}, days = {days}, time = {time}, active = {active} WHERE id = {id}").on(
-          "id" -> service.id,
+      SQL("UPDATE SERVICES SET serviceName = {serviceName}, serviceDescription = {serviceDescription}, days = {days}, time = {time}, active = {active} WHERE serviceId = {serviceId}").on(
+          "serviceId" -> service.serviceId,
           "serviceName" -> service.serviceName,
           "serviceDescription" -> service.serviceDescription,
           "days" -> service.days,
@@ -151,6 +152,35 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
           "active" -> service.active
         ).execute()
 
+    }
+  }
+
+  override def registerService(clientId: String, serviceId: String): Unit = {
+    DB.withConnection{implicit connection =>
+      SQL("INSERT INTO ClientServiceRel (id, serviceId)VALUES({id},{serviceId})").on("id" -> clientId, "serviceId" -> serviceId)
+        .execute()
+    }
+  }
+  override def getClientWithServices(clientId: String): ClientServiceRel = {
+    val client = getClient(clientId)
+    DB.withConnection{implicit connection =>
+      val serviceQuery = SQL("SELECT * FROM SERVICES WHERE serviceId IN (SELECT serviceId FROM ClientServiceRel)")
+      val services: Seq[Service] = serviceQuery.as(Service.mapServiceFromDB *)
+      ClientServiceRel(client, services)
+    }
+  }
+  override def getUnregisteredServices(): ListServices = {
+    DB.withConnection{implicit  connection =>
+      val serviceQuery = SQL("SELECT * FROM SERVICES WHERE serviceId NOT IN (SELECT serviceId FROM ClientServiceRel)")
+      val services: Seq[Service] = serviceQuery.as(Service.mapServiceFromDB *)
+      ListServices(services)
+    }
+  }
+  override def getRegisteredServices(): ListServices ={
+    DB.withConnection{implicit  connection =>
+      val serviceQuery = SQL("SELECT * FROM SERVICES WHERE serviceId  IN (SELECT serviceId FROM ClientServiceRel)")
+      val services: Seq[Service] = serviceQuery.as(Service.mapServiceFromDB *)
+      ListServices(services)
     }
   }
 }

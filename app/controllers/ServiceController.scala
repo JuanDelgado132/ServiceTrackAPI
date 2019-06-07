@@ -1,7 +1,7 @@
 package controllers
 
 import Infrastructure.ServiceTrackDBRepository
-import Models.Service
+import Models.{ClientServiceRel, Service, ListServices}
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsSuccess, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -14,7 +14,7 @@ class ServiceController @Inject() (cc: ControllerComponents, repository: Service
       case success: JsSuccess[Service] => {
         val serviceToCreate = success.get
         repository.addNewService(serviceToCreate)
-        Created(Json.toJson(repository.getService(serviceToCreate.id)))
+        Created(Json.toJson(repository.getService(serviceToCreate.serviceId)))
       }
       case error => {
         BadRequest("A validation error has occurred")
@@ -37,12 +37,25 @@ class ServiceController @Inject() (cc: ControllerComponents, repository: Service
       case success: JsSuccess[Service] => {
         val service = success.get
         repository.updateService(service)
-        Ok(Json.toJson(repository.getService(service.id)))
+        Ok(Json.toJson(repository.getService(service.serviceId)))
       }
       case error => {
+
         BadRequest("A validation error has occured")
       }
     }
+  }
+  def RegisterService(clientId: String, serviceId: String) = Action{
+    repository.registerService(clientId, serviceId)
+    Ok("success")
+  }
+  def getUnregisteredServices() = Action{
+    val services = repository.getUnregisteredServices()
+    Ok(Json.toJson(services))
+  }
+  def getRegisteredServices() = Action {
+    val services = repository.getRegisteredServices()
+    Ok(Json.toJson(services))
   }
 
 }
