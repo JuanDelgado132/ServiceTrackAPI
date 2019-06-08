@@ -2,7 +2,7 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-
+GET      /                          controllers.HomeController.index
 GET     /users/:id                  controllers.UsersController.getUser(id: String)
 
 POST    /users                      controllers.UsersController.CreateNewUser
