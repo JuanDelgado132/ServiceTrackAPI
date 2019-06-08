@@ -2,23 +2,20 @@ package Infrastructure
 
 import play.api.db._
 import anorm._
-import anorm.SqlParser._
 import Models.{Client, ClientServiceRel, ListServices, Service, User}
 import javax.inject.{Inject, Singleton}
-import play.api.data._
-import org.h2.command.dml.Delete
-
-import scala.concurrent.ExecutionException
-
+import  java.util.UUID
 @Singleton
 class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRepositoryTrait {
 
 
   override def addNewUser(user: User): Unit = {
+
     DB.withConnection { implicit connection =>
+      val id = if (user.id == null) generateUniqueId() else user.id
       SQL("INSERT INTO USERS (id,firstName,lastName,email,admin,address,phone,userPassword)" +
         "VALUES({id},{firstName},{lastName},{email},{admin},{address},{phone},{userPassword})").on(
-        "id" -> user.id,
+        "id" -> id,
         "firstName" -> user.firstName,
         "lastName" -> user.lastName,
         "email" -> user.email,
@@ -67,11 +64,13 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
   }
 
   override def addNewClient(client: Client): Unit = {
+    val id = if (client.id == null) generateUniqueId() else client.id
+
     DB.withConnection { implicit connection =>
 
       SQL("INSERT INTO CLIENTS (id,firstName,lastName,gender,comments,birthday)" +
         "VALUES({id},{firstName},{lastName},{gender},{comments},{birthday})").on(
-        "id" -> client.id,
+        "id" -> id,
         "firstName" -> client.firstName,
         "lastName" -> client.lastName,
         "gender" -> client.gender,
@@ -117,10 +116,11 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
   }
 
   override def addNewService(service: Service): Unit = {
+    val id = if (service.serviceId == null) generateUniqueId() else service.serviceId
     DB.withConnection { implicit connection =>
       SQL("INSERT INTO SERVICES (serviceId,serviceName,serviceDescription,days,time,active)" +
         "VALUES({serviceId},{serviceName},{serviceDescription},{days},{time},{active})").on(
-        "serviceId" -> service.serviceId,
+        "serviceId" -> id,
         "serviceName" -> service.serviceName,
         "serviceDescription" -> service.serviceDescription,
         "days" -> service.days,
@@ -202,5 +202,9 @@ class ServiceTrackDBRepository @Inject()(DB: Database) extends ServiceTrackDBRep
       ListServices(services)
 
     }
+  }
+
+  def generateUniqueId(): String  = {
+    UUID.randomUUID().toString
   }
 }

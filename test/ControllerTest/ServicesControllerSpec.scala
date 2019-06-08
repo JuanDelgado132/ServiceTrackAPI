@@ -31,7 +31,7 @@ class ServicesControllerSpec extends PlaySpec with GuiceOneAppPerSuite with Resu
       val servicesController = new ServiceController(Helpers.stubControllerComponents(), app.injector.instanceOf(classOf[ServiceTrackDBRepository]))
       val result: Future[Result] = servicesController.getService("6b397900-e756-4fab-a9ce-3c6ba68c44f1").apply(FakeRequest())
       status(result) mustEqual OK
-      contentAsJson(result) mustEqual Json.toJson(servicesController.repository.getService("f968e4f5-1afd-44db-883d-1dcd3915d761"))
+      contentAsJson(result) mustEqual Json.toJson(servicesController.repository.getService("6b397900-e756-4fab-a9ce-3c6ba68c44f1"))
     }
   }
   "ServicesController#ServiceClient" should {
@@ -39,6 +39,7 @@ class ServicesControllerSpec extends PlaySpec with GuiceOneAppPerSuite with Resu
       val servicesController = new ServiceController(Helpers.stubControllerComponents(), app.injector.instanceOf(classOf[ServiceTrackDBRepository]))
       val ogService = servicesController.repository.getService("6b397900-e756-4fab-a9ce-3c6ba68c44f1")
       val updateService = Service(ogService.serviceId, ogService.serviceName, "new description", ogService.days, ogService.time, ogService.active)
+      println(updateService)
       val result: Future[Result] = servicesController.updateService.apply(FakeRequest().withJsonBody(Json.toJson(updateService)))
       status(result) mustEqual OK
       contentAsJson(result) mustEqual Json.toJson(updateService)
@@ -81,6 +82,16 @@ class ServicesControllerSpec extends PlaySpec with GuiceOneAppPerSuite with Resu
       val result: Future[Result] = servicesController.createNewService.apply(FakeRequest().withJsonBody(Json.toJson(service)))
       status(result) mustEqual CREATED
       contentAsJson(result) mustEqual Json.toJson(Json.toJson(service))
+    }
+  }
+  "ServicesController#UnregisteredServices" should {
+    "Return an array of un registered services" in {
+      val servicesController = new ServiceController(Helpers.stubControllerComponents(), app.injector.instanceOf(classOf[ServiceTrackDBRepository]))
+      val result: Future[Result] = servicesController.getUnregisteredServices().apply(FakeRequest())
+      status(result) mustEqual OK
+      contentAsJson(result) mustEqual Json.obj("services" -> Json.arr(Json.toJson(servicesController.repository.getService("6b397900-e756-4fab-a9ce-3c6ba68c44f1"))
+      , Json.toJson(servicesController.repository.getService("26d75a9c-fade-4570-9b07-451369d28fc3"))
+      ))
     }
   }
 
