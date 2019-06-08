@@ -12,7 +12,7 @@ class ClientsController @Inject() (cc: ControllerComponents, repository: Service
   def getClient(id: String) = Action {
     val client = repository.getClient(id)
     if(client == null)
-      Ok(s"Client ${id} does not exist")
+      NotFound(Json.toJson(client))
     else
       Ok(Json.toJson(client))
   }

@@ -6,10 +6,15 @@ case class ListServices(services: Seq[Service])
 
 object ListServices{
   implicit val servicesWrites: Writes[ListServices] = (list: ListServices) => {
-
-    Json.obj(
-      "services" -> list.services
-    )
+    if(list.services == null)
+      Json.obj(
+        "services" -> Json.arr()
+      )
+    else {
+      Json.obj(
+        "services" -> list.services
+      )
+    }
 
   }
 }

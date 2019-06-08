@@ -17,6 +17,10 @@ libraryDependencies ++= Seq( jdbc ,
   guice,
   evolutions
 )
+
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % "test"
+)
 libraryDependencies += "org.playframework.anorm" %% "anorm" % "2.6.2"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.192"

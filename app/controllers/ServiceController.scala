@@ -28,7 +28,7 @@ class ServiceController @Inject() (cc: ControllerComponents, repository: Service
   def getService(id: String) = Action{
     val service = repository.getService(id)
     if(service == null)
-      NotFound(s"Service ${id} was not found")
+      NotFound(Json.toJson(service))
     else
       Ok(Json.toJson(service))
   }
