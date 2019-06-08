@@ -1,13 +1,13 @@
 package controllers
 
 import Infrastructure.ServiceTrackDBRepository
-import Models.User
+import Models.{ResponseModel, User}
 import javax.inject._
 import play.api.mvc._
 import play.api.libs.json._ // JSON library
 
 @Singleton
-class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTrackDBRepository) extends AbstractController(cc){
+class UsersController @Inject() (cc: ControllerComponents, val repository: ServiceTrackDBRepository) extends AbstractController(cc){
 
   def getUser(id: String) = Action{
     val user = repository.getUser(id)
@@ -18,7 +18,7 @@ class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTr
   }
   def DeleteUser(id: String) = Action {
     repository.deleteUser(id)
-    Ok("User successfully deleted")
+    Ok(Json.toJson(ResponseModel(OK, "Successfully deleted user")))
   }
 
   def CreateNewUser = Action { implicit request =>
@@ -29,7 +29,7 @@ class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTr
         Created(Json.toJson(repository.getUser(userToCreate.id)))
       }
       case e: JsError => {
-        BadRequest("A validation error occured")
+        BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
       }
     }
   }
@@ -42,7 +42,7 @@ class UsersController @Inject() (cc: ControllerComponents, repository: ServiceTr
         Ok(Json.toJson(repository.getUser(userToUpdate.id)))
       }
       case e: JsError => {
-        BadRequest("A validation error occured")
+        BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
       }
     }
   }

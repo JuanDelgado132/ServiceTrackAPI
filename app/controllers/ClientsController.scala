@@ -1,13 +1,13 @@
 package controllers
 
 import Infrastructure.ServiceTrackDBRepository
-import Models.{Client, User}
+import Models.{Client, ResponseModel, User}
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 
 @Singleton
-class ClientsController @Inject() (cc: ControllerComponents, repository: ServiceTrackDBRepository) extends AbstractController(cc){
+class ClientsController @Inject() (cc: ControllerComponents, val repository: ServiceTrackDBRepository) extends AbstractController(cc){
 
   def getClient(id: String) = Action {
     val client = repository.getClient(id)
@@ -24,7 +24,7 @@ class ClientsController @Inject() (cc: ControllerComponents, repository: Service
           Created(Json.toJson(repository.getClient(clientToCreate.id)))
         }
         case e: JsError => {
-          BadRequest("A validation error occurred")
+          BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
         }
       }
   }
@@ -33,17 +33,17 @@ class ClientsController @Inject() (cc: ControllerComponents, repository: Service
         case s: JsSuccess[Client] => {
           val clientToUpdate = s.get
           repository.updateClient(clientToUpdate)
-          Created(Json.toJson(repository.getClient(clientToUpdate.id)))
+          Ok(Json.toJson(repository.getClient(clientToUpdate.id)))
         }
         case e: JsError => {
-          BadRequest("A validation error occurred")
+          BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
         }
       }
   }
 
   def DeleteClient(id: String)  = Action {
     repository.deleteClient(id)
-    Ok("Client successfully deleted")
+    Ok(Json.toJson(ResponseModel(OK, "Client deleted")))
   }
 
   def getClientWithServices(clientId: String) = Action{

@@ -1,13 +1,14 @@
 package controllers
 
 import Infrastructure.ServiceTrackDBRepository
-import Models.{ClientServiceRel, Service, ListServices}
+import Models.{ClientServiceRel, ListServices, ResponseModel, Service}
+import akka.http.scaladsl.model.StatusCode
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.{JsSuccess, Json}
 import play.api.mvc.{AbstractController, ControllerComponents}
 
 @Singleton
-class ServiceController @Inject() (cc: ControllerComponents, repository: ServiceTrackDBRepository) extends AbstractController(cc){
+class ServiceController @Inject() (cc: ControllerComponents, val repository: ServiceTrackDBRepository) extends AbstractController(cc){
 
   def createNewService() = Action { implicit request =>
     request.body.asJson.get.validate[Service] match {
@@ -17,13 +18,13 @@ class ServiceController @Inject() (cc: ControllerComponents, repository: Service
         Created(Json.toJson(repository.getService(serviceToCreate.serviceId)))
       }
       case error => {
-        BadRequest("A validation error has occurred")
+        BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
       }
     }
   }
   def deleteService(id: String) = Action{
     repository.deleteService(id)
-    Ok("Success deleting service")
+    Ok(Json.toJson(ResponseModel(OK, "Success in deleting service")))
   }
   def getService(id: String) = Action{
     val service = repository.getService(id)
@@ -41,13 +42,13 @@ class ServiceController @Inject() (cc: ControllerComponents, repository: Service
       }
       case error => {
 
-        BadRequest("A validation error has occured")
+        BadRequest(Json.toJson(ResponseModel(BAD_REQUEST, "Validation error occurred")))
       }
     }
   }
   def RegisterService(clientId: String, serviceId: String) = Action{
     repository.registerService(clientId, serviceId)
-    Ok("success")
+    Ok(Json.toJson(ResponseModel(OK, "Service registered")))
   }
   def getUnregisteredServices() = Action{
     val services = repository.getUnregisteredServices()

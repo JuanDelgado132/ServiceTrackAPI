@@ -23,6 +23,11 @@ libraryDependencies ++= Seq(
 )
 libraryDependencies += "org.playframework.anorm" %% "anorm" % "2.6.2"
 
+libraryDependencies += "io.swagger" %% "swagger-play2" % "1.7.0"
+libraryDependencies += "org.webjars" %% "webjars-play" % "2.7.0"
+libraryDependencies += "org.webjars" % "swagger-ui" % "3.22.0"
+
+
 libraryDependencies += "com.h2database" % "h2" % "1.4.192"
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 

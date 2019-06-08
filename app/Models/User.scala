@@ -30,7 +30,8 @@ object User{
         "email" -> user.email,
         "admin" -> user.admin,
         "address" -> user.address,
-        "phone" -> user.phone
+        "phone" -> user.phone,
+        "userPassword" -> user.userPassword
       )
     }
   }
