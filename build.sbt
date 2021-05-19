@@ -1,34 +1,30 @@
-name := "ServiceTrackAPI"
- 
-version := "1.0" 
-      
 lazy val `servicetrackapi` = (project in file(".")).enablePlugins(PlayScala)
 
-resolvers += "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
-      
-resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
+name := "ServiceTrackAPI"
+version := "1.0"
+scalaVersion := "2.13.6"
 
-scalaVersion := "2.12.2"
-
-libraryDependencies ++= Seq( jdbc , 
-  ehcache , 
-  ws , 
-  specs2 % Test , 
-  guice,
-  evolutions
+scalacOptions ++= Seq(
+  "-language:postfixOps"
+)
+resolvers ++= Seq(
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+  ("Akka Snapshot Repository" at "http://repo.akka.io/snapshots/").withAllowInsecureProtocol(true)
 )
 
 libraryDependencies ++= Seq(
-  "org.scalatestplus.play" %% "scalatestplus-play" % "3.0.0" % "test"
+  jdbc,
+  ehcache,
+  ws,
+  specs2 % Test,
+  guice,
+  evolutions,
+  "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % "test",
+  ("org.playframework.anorm" %% "anorm" % "2.6.10"),
+  "org.webjars" %% "webjars-play" % "2.7.3",
+  "com.h2database" % "h2" % "1.4.192"
 )
-libraryDependencies += "org.playframework.anorm" %% "anorm" % "2.6.2"
-
-libraryDependencies += "io.swagger" %% "swagger-play2" % "1.7.0"
-libraryDependencies += "org.webjars" %% "webjars-play" % "2.7.0"
-libraryDependencies += "org.webjars" % "swagger-ui" % "3.22.0"
-
-
-libraryDependencies += "com.h2database" % "h2" % "1.4.192"
-unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
+(unmanagedResourceDirectories in Test) +=  baseDirectory.value /"target/web/public/test"
 
       
