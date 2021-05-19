@@ -1,4 +1,4 @@
-FROM hseeberger/scala-sbt:8u222_1.3.5_2.13.1
+FROM jdelgado5443/jdelgado:open-jdk-11_sbt-1.5.2_scala-2.13.6
 
 WORKDIR home/play
 
