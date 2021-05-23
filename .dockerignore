@@ -4,3 +4,4 @@
 !project/build.properties
 !project/plugins.sbt
 !build.sbt
+!.jvmopts
