@@ -1,19 +1,22 @@
-FROM jdelgado5443/jdelgado:open-jdk-11_sbt-1.5.2_scala-2.13.6
+FROM hseeberger/scala-sbt:graalvm-ce-21.1.0-java11_1.5.2_2.13.6
 
 WORKDIR home/play
+RUN mkdir project
+RUN mkdir app
+RUN mkdir conf
 
 COPY .jvmopts home/play
-COPY project/build.properties home/play/project
-COPY project/plugins.sbt home/play/project
+COPY project/build.properties ./project
+COPY project/plugins.sbt ./project
 RUN sbt update
 
-COPY build.sbt home/play
+COPY build.sbt .
 RUN sbt update
 
-COPY app /home/play/app
-COPY conf home/play/conf
+COPY app ./app
+COPY conf ./conf
 RUN sbt compile
 
 RUN sbt clean test stage
 
-CMD home/play/universal/stage/bin/servicetrackapi
+CMD ./target/universal/stage/bin/servicetrackapi -Dplay.evolutions.db.default.autoApply=true -Dplay.http.secret.key=$SECRET
